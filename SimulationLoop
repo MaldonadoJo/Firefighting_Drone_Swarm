@@ -1,0 +1,63 @@
+clear; clc; close all;
+
+% -----------------------------
+% Define parameters
+% -----------------------------
+
+params.rows = 30;
+params.cols = 30;
+
+% Start fires at two points
+params.starting_fires = [ 10 5; 27 21]; % starting location 
+params.start_intensity = 1; % intensity
+
+% Fire dynamics
+params.spread_rate = 0.2;  % spreads to neighbors
+params.decay_rate = 0.05;  % fire fades per step
+
+% Simulation control
+params.max_steps = 50;     % run per steps / time span
+params.display = true;     % visualization if true
+
+% -----------------------------
+% Initialize the fire
+% -----------------------------
+fire = init_fire(params);
+
+%------------------------------
+% Initializing drones
+%------------------------------
+Drones = []
+numDrones = 3
+for i=1:numDrones
+	Drones(i) = Drone()
+	Drones(i).speed = droneSpeed
+	Drones(i).location = [0 0] %Starts at top left corner
+	Drones(i).setTarget(Grid)
+end
+
+
+%------------------------------
+% Simulation Loop
+%------------------------------
+while true
+	for i =1:numDrones
+		if Drones(i).reachedTarget() == false
+			Drones(i).move()
+        else
+            if isEqual(Drone(i).location, [0 0])
+				Drone(i).find_fire(Grid)
+            else
+			    takeOutFire(Drone(i).location)
+			    Drone(i).target = [0 0]
+            end
+        end
+        if fire.count == 0
+            break
+        end
+    end
+    if fire.count == 0
+            break
+    end
+end
+disp("Simulation ended, fire extinguished")
